@@ -13,3 +13,4 @@ jobs:
         SLACK_TITLE: 'Commit Message'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
+
