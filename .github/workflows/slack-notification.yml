@@ -18,3 +18,4 @@ jobs:
         SLACK_TITLE: Post Title
         SLACK_USERNAME: Dibblyy
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_FOOTER: 'Dibbly Inc.'
