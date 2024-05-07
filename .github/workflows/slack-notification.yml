@@ -6,12 +6,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Send Slack Notification
-      run: |
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"New push to the repository:\n\nCommit: $GITHUB_SHA\nAuthor: $GITHUB_ACTOR\nBranch: $GITHUB_REF\nWorkflow: $GITHUB_WORKFLOW"}' ${{ secrets.SLACK_WEBHOOK }}
+    # - name: Send Slack Notification
+    #   run: |
+    #     curl -X POST -H 'Content-type: application/json' --data '{"text":"New push to the repository:\n\nCommit: $GITHUB_SHA\nAuthor: $GITHUB_ACTOR\nBranch: $GITHUB_REF\nWorkflow: $GITHUB_WORKFLOW"}' ${{ secrets.SLACK_WEBHOOK }}
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: testchannel
+        SLACK_TITLE: 'Commit Message'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_FOOTER: 'Dibbly Inc.'
+        SLACK_FOOTER: 'Powered by Dibbly Inc.'
