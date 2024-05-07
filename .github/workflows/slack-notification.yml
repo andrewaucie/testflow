@@ -6,9 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    # - name: Send Slack Notification
-    #   run: |
-    #     curl -X POST -H 'Content-type: application/json' --data '{"text":"New push to the repository:\n\nCommit: $GITHUB_SHA\nAuthor: $GITHUB_ACTOR\nBranch: $GITHUB_REF\nWorkflow: $GITHUB_WORKFLOW"}' ${{ secrets.SLACK_WEBHOOK }}
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
