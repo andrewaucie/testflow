@@ -1,0 +1,21 @@
+name: Slack Notification on Push
+
+on:
+  push:
+    branches:
+      - main # Adjust the branch name as needed
+
+jobs:
+  send_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: 'Good News!'
+          author_name: 'GitHub Actions'
+          title: 'New Push'
+          text: 'A new push has been made to the repository.'
+        env:
+          SLACK_WEBHOOK: ${{ https://hooks.slack.com/services/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 }}
