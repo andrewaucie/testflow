@@ -43,10 +43,3 @@ jobs:
         SLACK_MESSAGE: '${{ steps.pr_details.outputs.pr_url }}'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
-
-    - name: Send Hello World Message
-      run: |
-        author="${{ steps.pr_details.outputs.pr_author }}"
-        pr_name="${{ steps.pr_details.outputs.pr_title }}"
-        pr_link="${{ steps.pr_details.outputs.pr_url }}"
-        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"Author: $author\nPR Name: $pr_name\nPR Link: $pr_link\"}" "${{ secrets.SLACK_WEBHOOK }}"
