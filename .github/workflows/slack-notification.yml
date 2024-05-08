@@ -20,7 +20,11 @@ jobs:
     - name: Get PR Details
       id: pr_details
       run: |
-        pr_number="${{ github.event.inputs.pr_number }}"
+        if [ -z "${{ github.event.inputs.pr_number }}" ]; then
+          pr_number="${{ steps.pr_number.outputs.pr_number }}"
+        else
+          pr_number="${{ github.event.inputs.pr_number }}"
+        fi
         pr_details=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
         pr_title=$(echo "$pr_details" | jq -r '.title')
         pr_author=$(echo "$pr_details" | jq -r '.user.login')
