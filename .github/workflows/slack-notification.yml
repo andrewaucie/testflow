@@ -31,24 +31,27 @@ jobs:
         pr_title=$(echo "$pr_details" | jq -r '.title')
         pr_author=$(echo "$pr_details" | jq -r '.user.login')
         pr_url=$(echo "$pr_details" | jq -r '.html_url')
+        pr_body=$(echo "$pr_details" | jq -r '.body')
         echo "::set-output name=pr_number::$pr_number"
         echo "::set-output name=pr_title::$pr_title"
         echo "::set-output name=pr_author::$pr_author"
         echo "::set-output name=pr_url::$pr_url"
+        echo "::set-output name=pr_body::$pr_body"
 
     # - name: Get Asana Link
     #   id: get_asana_link
     #   run: |
-    #     pr_details="${{ steps.pr_details.outputs.pr_details }}"
+    #     pr_body="${{ steps.pr_details.outputs.pr_body }}"
     #     asana_link=$(echo "$pr_details" | grep -o 'https://app.asana.com/.*')
     #     echo "::set-output name=asana_link::$asana_link"
 
-    # - name: Extract Task ID from Asana Link
-    #   id: extract_task_id
-    #   run: |
-    #     ASANA_LINK="${{ steps.get_asana_link.outputs.asana_link }}"
-    #     TASK_ID=$(echo "$ASANA_LINK" | sed 's/.*\/\([0-9]*\)$/\1/')
-    #     echo "::set-output name=task_id::$TASK_ID"
+    - name: Extract Task ID from Asana Link
+      id: extract_task_id
+      run: |
+        pr_body="${{ steps.pr_details.outputs.pr_body }}"
+        asana_link=$(echo "$pr_body" | grep -o 'https://app.asana.com/.*')
+        task_id=$(echo "$asana_link" | sed 's/.*\/\([0-9]*\)$/\1/')
+        echo "::set-output name=task_id::$task_id"
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
@@ -63,12 +66,22 @@ jobs:
     
     - name: Update Asana task
       run: |
-        ASANA_TASK_ID="1207258395420033"
-        DUE_DATE="${{ steps.pr_details.outputs.closed_date }}"
+        ASANA_TASK_ID="${{ steps.extract_task_id.outputs.task_id }}"
+        CURRENT_DATE=$(date +'%Y-%m-%d')
         BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
         PR_LINK="${{ steps.pr_details.outputs.pr_url }}"
         curl --request PUT \
-          --url "https://app.asana.com/api/1.0/tasks/$ASANA_TASK_ID" \
-          --header 'Authorization: Bearer ${{ secrets.ASANA_SECRET }}' \
+          --url "https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}" \
+          --header 'Authorization: Bearer ${{ secrets.ASANA_PAT }}' \
           --header 'Content-Type: application/json' \
-          --data "{\"due_on\": \"$CLOSED_DATE\", \"name\": \"Branch name: $BRANCH_NAME\nPR Link: $PR_LINK"}"
+          --data '
+          {
+            "data": {
+              "custom_fields": {
+                "1205147978455517": "testflow/dev",
+                "1205147978455522": "$PR_LINK"
+              },
+              "due_on": "'"$CURRENT_DATE"'"
+            }
+          }
+          '
