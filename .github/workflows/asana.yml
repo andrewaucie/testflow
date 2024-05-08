@@ -1,38 +1,38 @@
-name: AI-Service Build
+# name: AI-Service Build
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+# on:
+#   push:
+#     branches: ["main"]
+#   pull_request:
+#     branches: ["main"]
 
-permissions:
-  contents: read
+# permissions:
+#   contents: read
 
-jobs:
-  create-asana-attachment-job:
-    runs-on: ubuntu-latest
-    name: Create pull request attachments on Asana tasks
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened') # Condition for the first action
-    steps:
-      - name: Create pull request attachments
-        uses: Asana/create-app-attachment-github-action@latest
-        id: postAttachment
-        with:
-          asana-secret: ${{ secrets.ASANA_SECRET }}
-      - name: Log output status
-        run: echo "Status is ${{ steps.postAttachment.outputs.status }}"
+# jobs:
+#   create-asana-attachment-job:
+#     runs-on: ubuntu-latest
+#     name: Create pull request attachments on Asana tasks
+#     if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened') # Condition for the first action
+#     steps:
+#       - name: Create pull request attachments
+#         uses: Asana/create-app-attachment-github-action@latest
+#         id: postAttachment
+#         with:
+#           asana-secret: ${{ secrets.ASANA_SECRET }}
+#       - name: Log output status
+#         run: echo "Status is ${{ steps.postAttachment.outputs.status }}"
 
-  create-comment-in-asana-task-job:
-    runs-on: ubuntu-latest
-    name: Create a comment in Asana Task
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'closed' || github.event.action == 'reopened') # Condition for the second action
-    steps:
-      - name: Create a comment
-        uses: Asana/comment-on-task-github-action@v1.2
-        id: createComment
-        with:
-          asana-secret: ${{ secrets.ASANA_SECRET }}
-          comment-text: "{{PR_NAME}} is {{PR_STATE}}: {{PR_URL}}"
-      - name: Get status
-        run: echo "Status is ${{ steps.createComment.outputs.status }}"
+#   create-comment-in-asana-task-job:
+#     runs-on: ubuntu-latest
+#     name: Create a comment in Asana Task
+#     if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'closed' || github.event.action == 'reopened') # Condition for the second action
+#     steps:
+#       - name: Create a comment
+#         uses: Asana/comment-on-task-github-action@v1.2
+#         id: createComment
+#         with:
+#           asana-secret: ${{ secrets.ASANA_SECRET }}
+#           comment-text: "{{PR_NAME}} is {{PR_STATE}}: {{PR_URL}}"
+#       - name: Get status
+#         run: echo "Status is ${{ steps.createComment.outputs.status }}"
