@@ -16,9 +16,10 @@ jobs:
       id: pr_number
       if: ${{ github.event.inputs.pr_number == null }}
       run: |
-        latest_pr=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&per_page=1")
-        pr_number=$(echo "$latest_pr" | jq -r '.[0].number')
-        echo "::set-output name=pr_number::$pr_number"
+        all_closed_prs=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls?state=closed&per_page=100")
+        merged_prs=$(echo "$all_closed_prs" | jq -r 'map(select(.merged_at != null))')
+        latest_merged_pr=$(echo "$merged_prs" | jq -r 'sort_by(.merged_at) | last')
+        echo "::set-output name=latest_merged_pr::$latest_merged_pr"
     - name: Get PR Details
       id: pr_details
       run: |
@@ -61,6 +62,7 @@ jobs:
     #     echo "::set-output name=task_id::$task_id"
 
     - name: Slack Notification
+      secrets: inherit
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: testchannel
