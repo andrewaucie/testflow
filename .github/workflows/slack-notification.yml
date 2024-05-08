@@ -2,10 +2,7 @@ on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'PR number'
-        required: true
-      base_ref:
-        description: 'Base branch ref'
+        description: 'Pull Request #'
         required: true
 jobs:
   slackNotification:
