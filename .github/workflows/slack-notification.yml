@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'Pull Request Number'
+        description: 'PR Number'
         required: true
 jobs:
   slackNotification:
@@ -10,11 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      - name: Get PR Details
+        id: pr_details
+        run: |
+          pr_number="${{ github.event.inputs.pr_number }}"
+          base_ref="${{ github.event.inputs.base_ref }}"
+          pr_details=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
+          echo "::set-output name=pr_title::$(echo "$pr_details" | jq -r '.title')"
+          echo "::set-output name=pr_author::$(echo "$pr_details" | jq -r '.user.login')"
+          echo "::set-output name=pr_body::$(echo "$pr_details" | jq -r '.body')"
+      
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: testchannel
-        SLACK_TITLE: 'Commit Message'
+        SLACK_TITLE: 'PR Merged: ${{ steps.pr_details.outputs.pr_title }}'
+        SLACK_MESSAGE: 'Author: ${{ steps.pr_details.outputs.pr_author }}\nBody: ${{ steps.pr_details.outputs.pr_body }}'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
 
