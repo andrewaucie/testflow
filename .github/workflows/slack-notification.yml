@@ -5,33 +5,6 @@ on:
         description: 'PR Number'
         required: false
 jobs:
-  update-asana-task:
-    runs-on: ubuntu-latest
-    name: Update Asana task
-    steps:
-      - name: Get pull request details
-        id: pr_details
-        run: |
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_DETAILS=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER")
-          CLOSED_DATE=$(echo "$PR_DETAILS" | jq -r '.closed_at')
-          BRANCH_NAME=$(echo "$PR_DETAILS" | jq -r '.head.ref')
-          PR_LINK=$(echo "$PR_DETAILS" | jq -r '.html_url')
-          echo "::set-output name=closed_date::$CLOSED_DATE"
-          echo "::set-output name=branch_name::$BRANCH_NAME"
-          echo "::set-output name=pr_link::$PR_LINK"
-
-      - name: Update Asana task
-        run: |
-          ASANA_TASK_ID="your-asana-task-id"
-          CLOSED_DATE="${{ steps.pr_details.outputs.closed_date }}"
-          BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
-          PR_LINK="${{ steps.pr_details.outputs.pr_link }}"
-          curl --request PUT \
-            --url "https://app.asana.com/api/1.0/tasks/$ASANA_TASK_ID" \
-            --header 'Authorization: Bearer your-asana-token' \
-            --header 'Content-Type: application/json' \
-            --data "{\"due_on\": \"$CLOSED_DATE\", \"name\": \"Branch name: $BRANCH_NAME\nPR Link: $PR_LINK\"}"
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
@@ -70,3 +43,14 @@ jobs:
         SLACK_MESSAGE: '${{ steps.pr_details.outputs.pr_url }}'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
+    - name: Update Asana task
+      run: |
+        ASANA_TASK_ID="your-asana-task-id"
+        DUE_DATE="${{ steps.pr_details.outputs.closed_date }}"
+        BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
+        PR_LINK="${{ steps.pr_details.outputs.pr_url }}"
+        curl --request PUT \
+          --url "https://app.asana.com/api/1.0/tasks/$ASANA_TASK_ID" \
+          --header 'Authorization: Bearer ${{ secrets.ASANA_SECRET }}' \
+          --header 'Content-Type: application/json' \
+          --data "{\"due_on\": \"$CLOSED_DATE\", \"name\": \"Branch name: $BRANCH_NAME\nPR Link: $PR_LINK\"}"
