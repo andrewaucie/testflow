@@ -14,12 +14,13 @@ jobs:
       id: pr_details
       run: |
         pr_number="${{ github.event.inputs.pr_number }}"
-        base_ref="${{ github.event.inputs.base_ref }}"
         pr_details=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
-        echo "::set-output name=pr_title::$(echo "$pr_details" | jq -r '.title')"
-        echo "::set-output name=pr_author::$(echo "$pr_details" | jq -r '.user.login')"
-        echo "::set-output name=pr_body::$(echo "$pr_details" | jq -r '.body')"
-    
+        pr_title=$(echo "$pr_details" | jq -r '.title')
+        pr_author=$(echo "$pr_details" | jq -r '.user.login')
+        pr_url=$(echo "$pr_details" | jq -r '.html_url')
+        echo "::set-output name=pr_title::$pr_title"
+        echo "::set-output name=pr_author::$pr_author"
+        echo "::set-output name=pr_url::$pr_url"
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
@@ -29,3 +30,9 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
 
+    - name: Send Hello World Message
+      run: |
+        author="${{ steps.pr_details.outputs.pr_author }}"
+        pr_name="${{ steps.pr_details.outputs.pr_title }}"
+        pr_link="${{ steps.pr_details.outputs.pr_url }}"
+        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"Author: $author\nPR Name: $pr_name\nPR Link: $pr_link\"}" "${{ secrets.SLACK_WEBHOOK }}"
