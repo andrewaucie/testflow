@@ -3,12 +3,8 @@ name: AI-Service Build
 on:
   push:
     branches: ["main"]
-    paths-ignore:
-      - "ai-tools/**"
   pull_request:
     branches: ["main"]
-    paths-ignore:
-      - "ai-tools/**"
 
 permissions:
   contents: read
