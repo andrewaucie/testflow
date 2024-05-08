@@ -32,10 +32,10 @@ jobs:
         pr_author=$(echo "$pr_details" | jq -r '.user.login')
         pr_url=$(echo "$pr_details" | jq -r '.html_url')
         pr_body=$(echo "$pr_details" | jq -r '.body')
-        echo "pr_title: $pr_title"
-        echo "pr_url: $pr_author"
+
         asana_link=$(echo "$pr_body" | grep -o 'https://app.asana.com/.*')
         task_id=$(echo "$asana_link" | sed 's/.*\/\([0-9]*\)$/\1/')
+                
         echo "::set-output name=task_id::$task_id"
         echo "::set-output name=pr_number::$pr_number"
         echo "::set-output name=pr_title::$pr_title"
@@ -71,28 +71,28 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
     
-    - name: Update Asana task
-      run: |
-        ASANA_TASK_ID="${{ steps.pr_details.outputs.task_id }}"
-        CURRENT_DATE=$(date +'%Y-%m-%d')
-        BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
-        PR_LINK="${{ steps.pr_details.outputs.pr_url }}"
-        echo "ASANA_TASK_ID: $ASANA_TASK_ID"
-        echo "CURRENT_DATE: $CURRENT_DATE"
-        echo "BRANCH_NAME: $BRANCH_NAME"
-        echo "PR_LINK: $PR_LINK"
-        curl --request PUT \
-          --url "https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}" \
-          --header 'Authorization: Bearer ${{ secrets.ASANA_PAT }}' \
-          --header 'Content-Type: application/json' \
-          --data '
-          {
-            "data": {
-              "custom_fields": {
-                "1205147978455517": "testflow/dev",
-                "1205147978455522": "$PR_LINK"
-              },
-              "due_on": "'"$CURRENT_DATE"'"
-            }
-          }
-          '
+    # - name: Update Asana task
+    #   run: |
+    #     ASANA_TASK_ID="${{ steps.pr_details.outputs.task_id }}"
+    #     CURRENT_DATE=$(date +'%Y-%m-%d')
+    #     BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
+    #     PR_LINK="${{ steps.pr_details.outputs.pr_url }}"
+    #     echo "ASANA_TASK_ID: $ASANA_TASK_ID"
+    #     echo "CURRENT_DATE: $CURRENT_DATE"
+    #     echo "BRANCH_NAME: $BRANCH_NAME"
+    #     echo "PR_LINK: $PR_LINK"
+    #     curl --request PUT \
+    #       --url "https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}" \
+    #       --header 'Authorization: Bearer ${{ secrets.ASANA_PAT }}' \
+    #       --header 'Content-Type: application/json' \
+    #       --data '
+    #       {
+    #         "data": {
+    #           "custom_fields": {
+    #             "1205147978455517": "testflow/dev",
+    #             "1205147978455522": "$PR_LINK"
+    #           },
+    #           "due_on": "'"$CURRENT_DATE"'"
+    #         }
+    #       }
+    #       '
