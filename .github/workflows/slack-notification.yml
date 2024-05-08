@@ -1,17 +1,45 @@
 on:
   workflow_dispatch:
-
+    inputs:
+      pr_number:
+        description: 'PR Number'
+        required: false
 jobs:
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Get PR Number
+      id: pr_number
+      if: ${{ github.event.inputs.pr_number == null }}
+      run: |
+        latest_pr=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls?state=all&per_page=1")
+        pr_number=$(echo "$latest_pr" | jq -r '.[0].number')
+        echo "::set-output name=pr_number::$pr_number"
+    - name: Get PR Details
+      id: pr_details
+      run: |
+        if [ -z "${{ github.event.inputs.pr_number }}" ]; then
+          pr_number="${{ steps.pr_number.outputs.pr_number }}"
+        else
+          pr_number="${{ github.event.inputs.pr_number }}"
+        fi
+        pr_details=$(curl -sSL -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
+        pr_title=$(echo "$pr_details" | jq -r '.title')
+        pr_author=$(echo "$pr_details" | jq -r '.user.login')
+        pr_url=$(echo "$pr_details" | jq -r '.html_url')
+        echo "::set-output name=pr_number::$pr_number"
+        echo "::set-output name=pr_title::$pr_title"
+        echo "::set-output name=pr_author::$pr_author"
+        echo "::set-output name=pr_url::$pr_url"
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: testchannel
-        SLACK_TITLE: 'Commit Message'
+        MSG_MINIMAL: true
+        SLACK_MSG_AUTHOR: '${{ steps.pr_details.outputs.pr_author }}'
+        SLACK_TITLE: 'PR #${{ steps.pr_details.outputs.pr_number }}: ${{ steps.pr_details.outputs.pr_title }}'
+        SLACK_MESSAGE: '${{ steps.pr_details.outputs.pr_url }}'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
-
