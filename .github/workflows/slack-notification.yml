@@ -25,8 +25,9 @@ jobs:
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: testchannel
-        SLACK_TITLE: 'PR Merged: ${{ steps.pr_details.outputs.pr_title }}'
-        SLACK_MESSAGE: 'Author: ${{ steps.pr_details.outputs.pr_author }}\nBody: ${{ steps.pr_details.outputs.pr_body }}'
+        MSG_MINIMAL: true
+        SLACK_TITLE: 'Deployed PR $${steps.pr_details.outputs.pr_number}: ${{ steps.pr_details.outputs.pr_title }}'
+        SLACK_MESSAGE: '${{ steps.pr_details.outputs.pr_url }}'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         SLACK_FOOTER: 'Powered by Dibbly Inc.'
 
