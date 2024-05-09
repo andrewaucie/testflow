@@ -44,12 +44,12 @@ jobs:
         echo "::set-output name=pr_url::$pr_url"
         echo "::set-output name=pr_body::$pr_body"
 
-    - name: Get Asana Link
-      id: get_asana_link
-      run: |
-        pr_body="${{ steps.pr_details.outputs.pr_body }}"
-        asana_link=$(echo "$pr_details" | grep -o 'https://app.asana.com/.*')
-        echo "::set-output name=asana_link::$asana_link"
+    # - name: Get Asana Link
+    #   id: get_asana_link
+    #   run: |
+    #     pr_body="${{ steps.pr_details.outputs.pr_body }}"
+    #     asana_link=$(echo "$pr_details" | grep -o 'https://app.asana.com/.*')
+    #     echo "::set-output name=asana_link::$asana_link"
 
     - name: Extract Task ID from Asana Link
       id: extract_task_id
