@@ -51,15 +51,15 @@ jobs:
     #     asana_link=$(echo "$pr_details" | grep -o 'https://app.asana.com/.*')
     #     echo "::set-output name=asana_link::$asana_link"
 
-    - name: Extract Task ID from Asana Link
-      id: extract_task_id
-      run: |
-        pr_body="${{ steps.pr_details.outputs.pr_body }}"
-        echo "pr_body: $pr_body"
+    # - name: Extract Task ID from Asana Link
+    #   id: extract_task_id
+    #   run: |
+    #     pr_body="${{ steps.pr_details.outputs.pr_body }}"
+    #     echo "pr_body: $pr_body"
 
-        asana_link=$(echo "$pr_body" | grep -o 'https://app.asana.com/.*')
-        task_id=$(echo "$asana_link" | sed 's/.*\/\([0-9]*\)$/\1/')
-        echo "::set-output name=task_id::$task_id"
+    #     asana_link=$(echo "$pr_body" | grep -o 'https://app.asana.com/.*')
+    #     task_id=$(echo "$asana_link" | sed 's/.*\/\([0-9]*\)$/\1/')
+    #     echo "::set-output name=task_id::$task_id"
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
