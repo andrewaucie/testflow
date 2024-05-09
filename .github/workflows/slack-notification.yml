@@ -33,9 +33,9 @@ jobs:
         pr_author=$(echo "$pr_details" | jq -r '.user.login')
         pr_url=$(echo "$pr_details" | jq -r '.html_url')
         pr_body=$(echo "$pr_details" | jq -r '.body')
+        pr_branch=$(echo "$pr_details" | jq -r '.head.ref')
 
-        asana_link=$(echo "$pr_body" | grep -o 'https://app.asana.com/.*')
-        task_id=$(echo "$asana_link" | sed 's/.*\/\([0-9]*\)$/\1/')
+        task_id=$(echo "$pr_body" | grep -o '(https://app.asana.com/.*)' | sed 's|[()]||g' | sed 's|/f||' | grep -oE '[0-9]+$')
                 
         echo "::set-output name=task_id::$task_id"
         echo "::set-output name=pr_number::$pr_number"
@@ -43,6 +43,7 @@ jobs:
         echo "::set-output name=pr_author::$pr_author"
         echo "::set-output name=pr_url::$pr_url"
         echo "::set-output name=pr_body::$pr_body"
+        echo "::set-output name=pr_branch::$pr_branch"
 
     # - name: Get Asana Link
     #   id: get_asana_link
@@ -76,7 +77,7 @@ jobs:
       run: |
         ASANA_TASK_ID="${{ steps.pr_details.outputs.task_id }}"
         CURRENT_DATE=$(date +'%Y-%m-%d')
-        BRANCH_NAME="${{ steps.pr_details.outputs.branch_name }}"
+        BRANCH_NAME="${{ steps.pr_details.outputs.pr_branch }}"
         PR_LINK="${{ steps.pr_details.outputs.pr_url }}"
         echo "ASANA_TASK_ID: $ASANA_TASK_ID"
         echo "CURRENT_DATE: $CURRENT_DATE"
@@ -90,7 +91,7 @@ jobs:
           {
             "data": {
               "custom_fields": {
-                "1205147978455517": "testflow/dev",
+                "1205147978455517": "$BRANCH_NAME",
                 "1205147978455522": "$PR_LINK"
               },
               "due_on": "'"$CURRENT_DATE"'"
