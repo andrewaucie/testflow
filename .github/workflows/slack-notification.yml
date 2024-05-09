@@ -85,7 +85,7 @@ jobs:
         echo "PR_LINK: $PR_LINK"
         curl --request PUT \
           --url "https://app.asana.com/api/1.0/tasks/${ASANA_TASK_ID}" \
-          --header 'Authorization: Bearer ${{ secrets.ASANA_SECRET }}' \
+          --header 'Authorization: Bearer ${{ secrets.ASANA_PAT }}' \
           --header 'Content-Type: application/json' \
           --data '
           {
