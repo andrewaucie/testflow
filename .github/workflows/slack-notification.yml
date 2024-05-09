@@ -91,8 +91,8 @@ jobs:
           {
             "data": {
               "custom_fields": {
-                "1205147978455517": "$BRANCH_NAME",
-                "1205147978455522": "$PR_LINK"
+                "1205147978455517": "${BRANCH_NAME}",
+                "1205147978455522": "${PR_LINK}"
               },
               "due_on": "'"$CURRENT_DATE"'"
             }
