@@ -1,0 +1,38 @@
+[
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/7",
+        "number": 7,
+        "state": "closed",
+        "merged_at": null
+    },
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/5",
+        "number": 5,
+        "state": "closed",
+        "merged_at": "2024-05-08T14:31:11Z"
+    },
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/4",
+        "number": 4,
+        "state": "closed",
+        "merged_at": null
+    },
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/3",
+        "number": 3,
+        "state": "closed",
+        "merged_at": "2024-05-08T00:00:13Z"
+    },
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/2",
+        "number": 2,
+        "state": "closed",
+        "merged_at": "2024-05-07T23:56:06Z"
+    },
+    {
+        "url": "https://api.github.com/repos/andrewaucie/testflow/pulls/1",
+        "number": 1,
+        "state": "closed",
+        "merged_at": "2024-05-07T21:19:07Z"
+    }
+]
